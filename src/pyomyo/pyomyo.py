@@ -358,8 +358,8 @@ class Myo(object):
 				'''According to http://developerblog.myo.com/myocraft-emg-in-the-bluetooth-protocol/
 				each characteristic sends two secuential readings in each update,
 				so the received payload is split in two samples. According to the
-				Myo BLE specification, the data type of the EMG samples is int8_t.
-				'''
+				Myo BLE specification, the data type of the EMG samples is int8_t.'''
+
 				emg1 = struct.unpack('<8b', pay[:8])
 				emg2 = struct.unpack('<8b', pay[8:])
 				self.on_emg(emg1, 0)
@@ -496,7 +496,7 @@ class Myo(object):
 		self.write_attr(0x35, b'\x01\x00')  # Suscribe to EmgData3Characteristic
 
 		# struct.pack('<5B', 1, 3, emg_mode, imu_mode, classifier_mode)
-		self.write_attr(0x19, b'\x01\x03\x03\x01\x00')
+		self.write_attr(0x19, b'\x01\x03\x03\x04\x01')
 
 	def mc_start_collection(self):
 		'''Myo Connect sends this sequence (or a reordering) when starting data
@@ -589,12 +589,13 @@ if __name__ == '__main__':
 	def proc_emg(emg, moving, times=[]):
 		print(emg)
 
+
 	m.add_emg_handler(proc_emg)
 	m.connect()
 
 	m.add_arm_handler(lambda arm, xdir: print('arm', arm, 'xdir', xdir))
 	m.add_pose_handler(lambda p: print('pose', p))
-	# m.add_imu_handler(lambda quat, acc, gyro: print('quaternion', quat))
+	m.add_imu_handler(lambda quat, acc, gyro: print('quaternion', quat))
 	m.sleep_mode(1)
 	m.set_leds([128, 128, 255], [128, 128, 255])  # purple logo and bar LEDs
 	m.vibrate(1)
